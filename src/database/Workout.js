@@ -1,9 +1,27 @@
 const DB = require("./db.json")
 const {saveToDatabase} = require("./utils");
 
-const getAllWorkouts = () => {
+const getAllWorkouts = (filterParams) => {
     try{
-        return DB.workouts;
+        let workouts = DB.workouts
+        if(filterParams.mode) {
+            return DB.workouts.filter((workout) =>
+            workout.mode.toLowerCase().includes(filterParams.mode)
+            );
+        }
+        if (filterParams.equipment) {
+            workouts = workouts.filter((workout) =>
+              workout.equipment.toLowerCase().includes(filterParams.equipment.toLowerCase())
+            );
+        }
+        const page = parseInt(filterParams.page) || 1;
+        const pageSize = parseInt(filterParams.pageSize) || 10;
+        const startIndex = (page - 1) * pageSize;
+        const endIndex = startIndex + pageSize;
+        workouts = workouts.slice(startIndex, endIndex);
+      
+
+        return workouts;
     } catch(error) {
         throw { status: 500, message: error }
     }
